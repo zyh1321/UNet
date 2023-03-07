@@ -15,14 +15,14 @@ traindata, testdata = ACDC_dataset()
 Iou = []
 
 def Predict_result():
-    global model, img, label, state_dict, elbo, intersection, union
+    global model, img, label, state_dict
     model = UNet(input_channels=1, n_classes=4, bilinear=True)
     model.to('cuda')
     img, label = next(iter(testdata))
     img = img.to('cuda')
     label = label.to('cuda')
     # label = torch.unsqueeze(label, 1)
-    state_dict = torch.load('./weights/epoch_48,loss_0.0041,train_Iou_0.4884,test_Iou_0.4264.pth')
+    state_dict = torch.load('./weights/epoch_49,loss_0.0042,train_Iou_0.9668,test_Iou_0.8807.pth')
     model.load_state_dict(state_dict)
     model.eval()
     # torch.Size([batch_size, 2, 128, 128])
@@ -36,7 +36,7 @@ def Predict_result():
             # intersection = torch.logical_and(label[i], pred[i])
             # union = torch.logical_or(label[i], pred[i])
             # batch_iou = torch.sum(intersection) / torch.sum(union)
-            batch_iou = iou_mean(pred, label, 3)
+            batch_iou = iou_mean(pred, label, 4)
             Iou.append(batch_iou)
 
         plt.figure(figsize=(12, 12))

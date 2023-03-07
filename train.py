@@ -9,7 +9,7 @@ from UNet import UNet
 
 
 # iou计算
-def iou_mean(pred, target, n_classes=3):
+def iou_mean(pred, target, n_classes=4):
     # n_classes:the number of classes in your dataset,not including background
     ious = []
     iousSum = 0
@@ -28,7 +28,7 @@ def iou_mean(pred, target, n_classes=3):
         else:
             ious.append(float(intersection) / float(max(union, 1)))
             iousSum += float(intersection) / float(max(union, 1))
-        return iousSum / (n_classes - 1)
+    return iousSum / (n_classes - 1)
 
 
 
@@ -52,7 +52,7 @@ def train_net(net, epochs=50, lr=1e-4):
         for step, (patch, mask) in enumerate(tqdm(traindata)):
             patch, mask = patch.to(device), mask.to(device)
             # mask = torch.unsqueeze(mask, 1)
-            # 预测结果
+            # 预测结果,计算loss
             pred = net(patch)
             loss = criterion(pred, mask.long())
             # 更新参数
@@ -64,7 +64,7 @@ def train_net(net, epochs=50, lr=1e-4):
                 # intersection = torch.logical_and(mask, y_pred)
                 # union = torch.logical_or(mask, y_pred)
                 # batch_iou = torch.sum(intersection).type(torch.float) / torch.sum(union).type(torch.float)
-                batch_iou = iou_mean(y_pred, mask, 3)
+                batch_iou = iou_mean(y_pred, mask, 4)
                 epoch_iou.append(batch_iou)
 
         epoch_test_iou = []
@@ -78,7 +78,7 @@ def train_net(net, epochs=50, lr=1e-4):
                 # intersection = torch.logical_and(mask, y_pred)
                 # union = torch.logical_or(mask, y_pred)
                 # batch_test_iou = torch.sum(intersection).type(torch.float) / torch.sum(union).type(torch.float)
-                batch_test_iou = iou_mean(y_pred, mask, 3)
+                batch_test_iou = iou_mean(y_pred, mask, 4)
                 epoch_test_iou.append(batch_test_iou)
 
         print('epoch:', epoch, 'loss:', round(loss.item(), 4),
